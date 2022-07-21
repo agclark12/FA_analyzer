@@ -43,6 +43,8 @@ The cell level ("image") data includes the following additional parameters:
 
 In addition to these additional cell level data, the mean and standard deviations (std) of most of the focal adhesion parameters are also output to the image data csv file. For convenience, all of the focal adhesion and image data are collected together in csv files that are saved to the directory containing the images.
 
+Please note that the area and perimeter data are always given in pixels. This avoids errors due to  inconsistencies in images already having pixel sizes defined in the image metadata. For your analysis/data presentation, it is recommended to convert such values to real physical values (microns, e.g.). Also please be aware that if you are using different imaging parameters (zoom/objectives, e.g.), this conversion will be different for different images. For this reason, it is recommended to be consistent with your imaging parameters for a given data set that will be analyzed together.
+
 For more information on how to incorporate these scripts into your analysis pipeline for focal adhesion analysis, please see our accompanying article:
 
 XXX.
