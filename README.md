@@ -19,7 +19,31 @@ To run this script, open ```fa_analyzer.py``` in FIJI. This will bring up an edi
 
 As long as your mask image is an 8-bit binary image, you can create it any way you would like, for example using an automated segmentation in a previous analysis step. Just keep in mind that the naming convention must remain (anyways use the "_mask" suffix). If you would like to change this naming convention or the file type (in case you are using something other than Tiff images), you are free to do so in ```fa_analyzer.py``` in the ```main``` function at the bottom of the script. For more details on how the FA image and corresponding mask should be named and what the images should look like, refer to the included sample data.
 
-For more information on how to incorporate these scripts into your analysis pipline for focal adhesion analysis, please see our accompanying article:
+The script will automatically create new directories for storing data. These new directories be named according to your FA images. Within these directories, there will be csv files saved with data for each individual focal adhesion and data related to focal adhesions at the level of the whole cell ("image data").
+
+The focal adhesion data includes the following parameters:
+
+- fa_area_px : the area of the focal adhesion (in pixels)
+- perim_px : the perimeter of the focal adhesion (in pixels)
+- x0_px : the x-coordinate of the focal adhesion centroid (in pixels)
+- y0_px : the x-coordinate of the focal adhesion centroid (in pixels)
+- orientation_deg : the orientation angle of the focal adhesion (from -90 to 90 degrees)
+- ar : the aspect ratio of the focal adhesion (length of principal axis / normal axis)
+- sf : the shape factor of the focal adhesion (another measure of elongation, defined as sf = perimeter^2 / area)
+- dist_px : the minimal distance from the focal adhesion centroid to the cell border
+- angle_deg : the angle of the focal adhesion centroid with respect to the cell centroid (in degrees)
+- rel_orientation_deg : the relative orientation of the focal adhesion orientation with respect to the angle to the centroid (0 degrees means orientation is parallel with the angle to the centroid, 90 degrees means the orientation is perpendicular with the angle to the centroid)
+
+The cell level ("image") data includes the following additional parameters:
+
+- mask_area_px : the area of the cell mask (in pixels)
+- no_fas : the total number of focal adhesions within the cell mask area
+- area_fraction : the fraction of total focal adhesion area to cell area
+- frac_periph_fas : the fraction of "peripheral" focal adhesions (by default, the distance of "peripheral" focal adhesions to the cell border is less than 10% of the maximum distance from the border to the center of the cell; this 10% fraction is defined in the ```main``` function at the end of the script and can be changed, but it should be kept consistent for all images that are to be compared)
+
+In addition to these additional cell level data, the mean and standard deviations (std) of most of the focal adhesion parameters are also output to the image data csv file. For convenience, all of the focal adhesion and image data are collected together in csv files that are saved to the directory containing the images.
+
+For more information on how to incorporate these scripts into your analysis pipeline for focal adhesion analysis, please see our accompanying article:
 
 XXX.
 

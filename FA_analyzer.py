@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 
 This is a jython script to analyze focal adhesion data from a directory of focal adhesion images with corresponding masks.
@@ -18,10 +16,11 @@ This paramter is 'periph_frac', which should have a value 0-1 can be found in th
 
 """
 
+from __future__ import print_function, division
+
 __author__ = "Andrew Clark"
 __copyright__ = "Copyright 2022, FA Analyzer"
 
-from __future__ import print_function, division
 from exceptions import Exception as PythonException
 from re import split as re_split
 from os import listdir, sep, mkdir
