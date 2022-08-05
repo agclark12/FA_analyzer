@@ -324,7 +324,7 @@ def analyze_image(file_path,mask_suffix,file_ending,periph_frac):
 		
 	# makes a data dictionary for keeping track of the morphology data
 	fa_data = OrderedDict()
-	fa_data["basename"] = [basename] * no_rows
+	fa_data["basename"] = [basename] * no_rows #basename of image
 	fa_data["id"] = [None] * no_rows  #focal adhesion id
  	fa_data["fa_area_px"] = [None] * no_rows #area in pixels
 	fa_data["perim_px"] = [None] * no_rows #perimeter in pixels
@@ -347,67 +347,62 @@ def analyze_image(file_path,mask_suffix,file_ending,periph_frac):
 	central_count = 0
 	
 	# extracts the FA data and calculates some additional parameters
-	for i in range(no_rows):
-	
-		fa_data["id"][i] = i + 1
-		fa_data["fa_area_px"][i] = float(rt.getValue('PixelCount',i))
-		fa_data["perim_px"][i] = float(rt.getValue('Perimeter',i))
-		fa_data["x0_px"][i] = float(rt.getValue('Ellipse.Center.X',i))
-		fa_data["y0_px"][i] = float(rt.getValue('Ellipse.Center.Y',i))
-		fa_data["orientation_deg"][i] = -float(rt.getValue('Ellipse.Orientation',i)) #negative because origin is top left
-		fa_data["ar"][i] = float(rt.getValue('Ellipse.Elong',i))
-		fa_data["sf"][i] = float(rt.getValue('Perimeter',i)) / sqrt(float(rt.getValue('PixelCount',i)))
+	if no_rows > 0:
+		for i in range(no_rows):
 		
-		#gets distance to nearest contour pixel using distance transform
-		x0_round = int(round(float(rt.getValue('Ellipse.Center.X',i))))
-		y0_round = int(round(float(rt.getValue('Ellipse.Center.Y',i))))
-		fa_data["dist_px"][i] = dist_map.getPixel(x0_round,y0_round)[0]
-		periph_thresh = dist_map.getProcessor().getMax() * periph_frac
-		if fa_data["dist_px"][i] < periph_thresh:
-			periph_count += 1
-		else:
-			central_count += 1
-	
-		#calculates the relative orientation with respect a vector to the mask centroid
-		fa_data["angle_deg"][i] = degrees(-atan2(fa_data["y0_px"][i] - y0_mask, fa_data["x0_px"][i] - x0_mask)) #negative because origin is top left
-		fa_pos_orient = angle_to_orientation(fa_data["angle_deg"][i])
-		fa_data["rel_orientation_deg"][i] = get_angular_diff(fa_pos_orient,fa_data["orientation_deg"][i])
+			fa_data["id"][i] = i + 1
+			fa_data["fa_area_px"][i] = float(rt.getValue('PixelCount',i))
+			fa_data["perim_px"][i] = float(rt.getValue('Perimeter',i))
+			fa_data["x0_px"][i] = float(rt.getValue('Ellipse.Center.X',i))
+			fa_data["y0_px"][i] = float(rt.getValue('Ellipse.Center.Y',i))
+			fa_data["orientation_deg"][i] = -float(rt.getValue('Ellipse.Orientation',i)) #negative because origin is top left
+			fa_data["ar"][i] = float(rt.getValue('Ellipse.Elong',i))
+			fa_data["sf"][i] = float(rt.getValue('Perimeter',i)) / sqrt(float(rt.getValue('PixelCount',i)))
+			
+			#gets distance to nearest contour pixel using distance transform
+			x0_round = int(round(float(rt.getValue('Ellipse.Center.X',i))))
+			y0_round = int(round(float(rt.getValue('Ellipse.Center.Y',i))))
+			fa_data["dist_px"][i] = dist_map.getPixel(x0_round,y0_round)[0]
+			periph_thresh = dist_map.getProcessor().getMax() * periph_frac
+			if fa_data["dist_px"][i] < periph_thresh:
+				periph_count += 1
+			else:
+				central_count += 1
 		
-#		#for testing
-#		IJ.run(labels, "Specify...", "width=10 height=10 x="+str(int(round(x0_list[i])))+" y="+str(int(round(y0_list[i])))+" oval centered")
-#		overlay = Overlay()
-#		font = Font("SansSerif", Font.PLAIN, 20)
-#		roi = TextRoi(round(x0_list[i])-40, round(y0_list[i])-40, str(int(round(angle_list[i]))), font)
-#		roi.setStrokeColor(Color.red)
-#		overlay.add(roi)
-#		roi2 = TextRoi(round(x0_list[i])+10, round(y0_list[i])+10, str(int(round(orientation_list[i]))), font)
-#		roi2.setStrokeColor(Color.green)
-#		overlay.add(roi2)
-#		roi3 = TextRoi(round(x0_list[i])+40, round(y0_list[i])+40, str(int(round(rel_orientation_list[i]))), font)
-#		roi3.setStrokeColor(Color.black)
-#		overlay.add(roi3)
-#		labels.setOverlay(overlay)
-#		labels.show()
-#		myWait = WaitForUserDialog ("myTitle", "myMessage")
-#		myWait.show()
+			#calculates the relative orientation with respect a vector to the mask centroid
+			fa_data["angle_deg"][i] = degrees(-atan2(fa_data["y0_px"][i] - y0_mask, fa_data["x0_px"][i] - x0_mask)) #negative because origin is top left
+			fa_pos_orient = angle_to_orientation(fa_data["angle_deg"][i])
+			fa_data["rel_orientation_deg"][i] = get_angular_diff(fa_pos_orient,fa_data["orientation_deg"][i])
 
 	#closes the results window
 	IJ.selectWindow(rt.title)
 	IJ.run("Close")
 	
-	# calculates some parameters on the level of the image and records
+	#starts an ordered dict for collecting the image data
 	image_data = OrderedDict()
-	image_data["basename"] = basename
-	image_data["mask_area_px"] = area_mask 
-	image_data["no_fas"] = len(fa_data["id"]) #number of focal adhesions
-	image_data["area_fraction"] = sum(fa_data["fa_area_px"]) / area_mask #fraction of area covered by focal adhesions
-	image_data["frac_periph_fas"] = periph_count / (central_count + periph_count) #fraction of peripheral fas compared to total fas
-
-	# adds means/SDs of the fa data to the image data
+	image_data["basename"] = [] #basename of image
+	image_data["mask_area_px"] = [] #area of the mask in pixels
+	image_data["no_fas"] = [] #total number of focal adhesions
+	image_data["area_fraction"] = [] #fraction of area covered by focal adhesions
+	image_data["frac_periph_fas"] = [] #fraction of peripheral fas compared to total fas
 	keys = ["fa_area_px","perim_px","orientation_deg","ar","sf","dist_px","rel_orientation_deg"]
 	for key in keys:
-		image_data[key + "_mean"] = mean(fa_data[key])
-		image_data[key + "_std"] = std(fa_data[key])
+		image_data[key + "_mean"] = []
+		image_data[key + "_std"] = []
+	
+	# calculates some parameters on the level of the image and records
+	if no_rows > 0:
+	
+		image_data["basename"] = basename
+		image_data["mask_area_px"] = area_mask 
+		image_data["no_fas"] = len(fa_data["id"])
+		image_data["area_fraction"] = sum(fa_data["fa_area_px"]) / area_mask
+		image_data["frac_periph_fas"] = periph_count / (central_count + periph_count)
+
+		# adds means/SDs of the fa data to the image data
+		for key in keys:
+			image_data[key + "_mean"] = mean(fa_data[key])
+			image_data[key + "_std"] = std(fa_data[key])
 			
 	#saves the focal adhesion and image data
 	print("Saving Focal Adhesion and Image Data")

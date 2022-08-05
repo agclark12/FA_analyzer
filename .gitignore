@@ -5,3 +5,4 @@ __pycache__/
 *.csv
 sample_data/cell1/
 sample_data/cell2/
+test_data/
