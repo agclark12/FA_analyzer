@@ -471,6 +471,10 @@ def main():
 	
 	"""
 
+	#ensures black background for binary images
+	IJ.run("Options...", "iterations=1 count=1 black")
+	IJ.run("Colors...", "foreground=white background=black selection=yellow")
+
 	# specifies the parent directory and gets the FA data
 	parent_dir = IJ.getDirectory("Please select directory containing FA and mask images")
 	periph_frac = 0.1 #the fraction of FAs considered 'peripheral' with respect to the max distance from the edge to the center of the cell
