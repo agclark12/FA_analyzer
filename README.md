@@ -53,6 +53,6 @@ Please note that the area and perimeter data are always given in pixels. This av
 
 For more information on how to incorporate these scripts into your analysis pipeline for focal adhesion analysis, please see our accompanying article:
 
-XXX.
+van Stalborch A.-M.D.,  Clark A.G., Sonnenberg A. and Margadant C. (2023) Imaging and quantitative analysis of integrin-dependent cell-matrix adhesions. *STAR Protocols*.
 
 If you found these scripts to be useful, please feel free to cite our publication.
